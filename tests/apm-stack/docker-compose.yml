@@ -24,6 +24,7 @@ services:
       - "xpack.security.enabled=true"
       - "xpack.security.authc.token.enabled=true"
       - "xpack.security.authc.api_key.enabled=true"
+      - "xpack.license.self_generated.type=${LICENSE}"
       - "logger.org.elasticsearch=warn"
     volumes:
       - es_data:/usr/share/elasticsearch/data

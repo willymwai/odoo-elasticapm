@@ -2,6 +2,7 @@ server.host: 0.0.0.0
 status.allowAnonymous: true
 monitoring.ui.container.elasticsearch.enabled: false
 telemetry.enabled: false
+xpack.reporting.encryptionKey: __SECRET32CHARS__
 xpack.security.encryptionKey: __SECRET32CHARS__
 xpack.encryptedSavedObjects.encryptionKey: __SECRET32CHARS__
 

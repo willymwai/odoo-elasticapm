@@ -18,7 +18,12 @@ setup(
     name="odoo-elasticapm",
     description="Elastic APM integration for Odoo",
     long_description="\n".join(long_description),
-    use_scm_version=True,
+    use_scm_version={
+        'version_scheme': 'post-release',
+        'local_scheme': 'node-and-date',
+        "relative_to": __file__,
+        "root": "..",
+    },
     packages=["odoo_elasticapm"],
     include_package_data=True,
     setup_requires=["setuptools_scm"],

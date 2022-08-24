@@ -6,6 +6,7 @@ import os
 try:
     from odoo.tools.config import config
     from odoo.http import request
+    from odoo import api
     import odoo
     from odoo.exceptions import (
         UserError,
@@ -19,6 +20,7 @@ try:
 except ImportError:
     from openerp.tools.config import config
     from openerp.http import request
+    from openerp import api
     import openerp as odoo
     from openerp.exceptions import (
         Warning as UserError,
@@ -40,7 +42,7 @@ odoo_version = odoo.release.version
 
 def version_older_then(version):
     return (
-        odoo.tools.parse_version(odoo_version)[0] < odoo.tools.parse_version(version)[0]
+            odoo.tools.parse_version(odoo_version)[0] < odoo.tools.parse_version(version)[0]
     )
 
 
@@ -84,6 +86,30 @@ def capture_exception(exception):
     elastic_apm_client.capture_exception(
         context={"request": get_data_from_request()}, handled=handled
     )
+
+
+def build_params(self, method):
+    return {
+        "name": "ORM {} {}".format(self._name, method),
+        "span_type": "odoo",
+        "span_subtype": "orm",
+        "extra": {
+            "odoo": {
+                "class": self._name,
+                "method": method,
+                "nbr_record": hasattr(self, "_ids") and len(self) or 0,
+            }
+        },
+    }
+
+
+def base_write_create(self, vals, ori_method, method_name):
+    with elasticapm.capture_span(**build_params(self, method_name)):
+        try:
+            return ori_method(self, vals)
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
 if os.environ.get("ELASTIC_APM_ENVIRONMENT"):

@@ -4,7 +4,14 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from .base import elasticapm, version_older_then, capture_exception
+from .base import (
+    elasticapm,
+    version_older_then,
+    capture_exception,
+    build_params,
+    write,
+    create, base_write_create,
+)
 
 try:
     from odoo import api, models
@@ -12,22 +19,6 @@ try:
 except ImportError:
     from openerp import api, models
     from openerp.exceptions import UserError
-
-
-def build_params(self, method):
-    return {
-        "name": "ORM {} {}".format(self._name, method),
-        "span_type": "odoo",
-        "span_subtype": "orm",
-        "extra": {
-            "odoo": {
-                "class": self._name,
-                "method": method,
-                "nbr_record": hasattr(self, "_ids") and len(self) or 0,
-            }
-        },
-    }
-
 
 BaseModel = models.BaseModel
 ori_create = BaseModel.create
@@ -38,22 +29,12 @@ ori_unlink = BaseModel.unlink
 
 
 def write(self, vals):
-    with elasticapm.capture_span(**build_params(self, "write")):
-        try:
-            return ori_write(self, vals)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    return base_write_create(self, vals, ori_write, "write")
 
 
 @api.returns("self", lambda value: value.id)
 def create(self, vals):
-    with elasticapm.capture_span(**build_params(self, "create")):
-        try:
-            return ori_create(self, vals)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    return base_write_create(self, vals, ori_create, "create")
 
 
 def _search(self, *args, **kwargs):

@@ -1,4 +1,4 @@
-from .base import write, create, base_write_create
+from .base import base_write_create
 
 try:
     from odoo import api

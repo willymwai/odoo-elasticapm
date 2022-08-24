@@ -4,12 +4,14 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from .base import elasticapm, version_older_then
+from .base import elasticapm, version_older_then, capture_exception
 
 try:
     from odoo import api, models
+    from odoo.exceptions import UserError
 except ImportError:
     from openerp import api, models
+    from openerp.exceptions import UserError
 
 
 def build_params(self, method):
@@ -36,23 +38,39 @@ ori_unlink = BaseModel.unlink
 
 def write(self, vals):
     with elasticapm.capture_span(**build_params(self, "write")):
-        return ori_write(self, vals)
+        try:
+            return ori_write(self, vals)
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
 @api.returns("self", lambda value: value.id)
 def create(self, vals):
     with elasticapm.capture_span(**build_params(self, "create")):
-        return ori_create(self, vals)
+        try:
+            return ori_create(self, vals)
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
 def _search(self, *args, **kwargs):
     with elasticapm.capture_span(**build_params(self, "search")):
-        return ori_search(self, *args, **kwargs)
+        try:
+            return ori_search(self, *args, **kwargs)
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
 def unlink(self):
     with elasticapm.capture_span(**build_params(self, "unlink")):
-        return ori_unlink(self)
+        try:
+            return ori_unlink(self)
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
 if version_older_then("13.0"):

@@ -3,8 +3,12 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from .base import elastic_apm_client, elasticapm, version_older_then
-from .http import get_data_from_request
+from .base import (
+    elastic_apm_client,
+    elasticapm,
+    version_older_then,
+    get_data_from_request,
+)
 
 try:
     from odoo.addons.base.models.ir_http import IrHttp
@@ -18,6 +22,7 @@ except ImportError:
         from openerp.http import request
 
 SKIP_PATH = ["/connector/runjob", "/longpolling/", "/web_editor"]
+
 
 def base_dispatch(cls):
     cls._handle_debug()
@@ -49,6 +54,7 @@ def base_dispatch(cls):
         return cls._handle_exception(e)
 
     return result
+
 
 ori_dispatch = base_dispatch
 
@@ -97,7 +103,6 @@ if version_older_then("10.0"):
             after_dispatch(response)
             return response
 
-
 else:
 
     @classmethod
@@ -112,4 +117,3 @@ else:
 
 
 IrHttp._dispatch = _dispatch
-

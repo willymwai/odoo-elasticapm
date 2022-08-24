@@ -1,14 +1,14 @@
-from .base import base_write_create
+from .base import base_write_create, version_older_then
 
 try:
     from odoo import api
-    from odoo.addons.base.models import res_partner as ResPartner
+    from odoo.addons.base.models.res_partner import Partner
 except ImportError:
     from openerp import api
-    from openerp.addons.base.models import res_partner as ResPartner
+    from openerp.addons.base.models.res_partner import Partner
 
-ori_write = ResPartner.write
-ori_create = ResPartner.create
+ori_write = Partner.write
+ori_create = Partner.create
 
 
 def write(self, vals):
@@ -20,5 +20,11 @@ def create(self, vals):
     return base_write_create(self, vals, ori_create, "create")
 
 
-ResPartner.write = write
-ResPartner.create = create
+if version_older_then("12.0"):
+    create = api.model(create)
+else:
+    create = api.model_create_multi(create)
+
+
+Partner.write = write
+Partner.create = create

@@ -1,12 +1,12 @@
 from odoo_elasticapm.base import build_params, capture_exception, elasticapm
 
 try:
-    from odoo.fields import Field, Id, One2Many
+    from odoo.fields import Field, Id, One2many
 except ImportError:
-    from openerp.fields import Field, Id, One2Many
+    from openerp.fields import Field, Id, One2many
 
 
-for field in [Field, Id, One2Many]:
+for field in [Field, Id, One2many]:
     ori_get = field.__get__
 
     def __get__(self, obj, owner):

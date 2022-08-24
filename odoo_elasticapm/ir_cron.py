@@ -30,12 +30,13 @@ def after_cron(job):
     elastic_apm_client.end_transaction(name)
 
 
-ori_process_job = IrCron._process_job
+ir_cron = IrCron()
 
 
 if version_older_then("10.0"):
 
     def _process_job(self, job_cr, job, cron_cr):
+        ori_process_job = ir_cron._process_job
         before_cron(job)
         ori_process_job(self, job_cr, job, cron_cr)
         after_cron(job)
@@ -45,6 +46,8 @@ else:
 
     @classmethod
     def _process_job(cls, db, cron_cr, job):
+        ir_cron.pool = cls.pool
+        ori_process_job = ir_cron._process_job
         before_cron(job)
         ori_process_job(db, cron_cr, job)
         after_cron(job)

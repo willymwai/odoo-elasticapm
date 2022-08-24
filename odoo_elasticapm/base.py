@@ -92,13 +92,17 @@ def capture_exception(exception, is_http_request=False):
 
 
 def build_params(self, method):
+    try:
+        class_name = self._name
+    except AttributeError:
+        class_name = self.__class__.__name__
     return {
-        "name": "ORM {} {}".format(self._name, method),
+        "name": "ORM {} {}".format(class_name, method),
         "span_type": "odoo",
         "span_subtype": "orm",
         "extra": {
             "odoo": {
-                "class": self._name,
+                "class": class_name,
                 "method": method,
                 "nbr_record": hasattr(self, "_ids") and len(self) or 0,
             }

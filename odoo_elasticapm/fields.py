@@ -10,11 +10,12 @@ for field in [Field, Id, One2many]:
     ori_get = field.__get__
 
     def __get__(self, obj, owner):
-        with elasticapm.capture_span(**build_params(self, "__get__")):
-            try:
-                return ori_get(self, obj, owner)
-            except Exception as e:
-                capture_exception(e)
-                raise
+        if isinstance(self, field):
+            with elasticapm.capture_span(**build_params(self, "__get__")):
+                try:
+                    return ori_get(self, obj, owner)
+                except Exception as e:
+                    capture_exception(e)
+                    raise
 
     field.__get__ = __get__

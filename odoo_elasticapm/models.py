@@ -33,6 +33,7 @@ BaseModel = models.BaseModel
 ori_create = BaseModel.create
 ori_write = BaseModel.write
 ori_search = BaseModel._search
+ori_browse = BaseModel.browse
 ori_unlink = BaseModel.unlink
 
 
@@ -64,6 +65,15 @@ def _search(self, *args, **kwargs):
             raise
 
 
+def browse(self, *args, **kwargs):
+    with elasticapm.capture_span(**build_params(self, "browse")):
+        try:
+            return ori_browse(self, *args, **kwargs)
+        except Exception as e:
+            capture_exception(e)
+            raise
+
+
 def unlink(self):
     with elasticapm.capture_span(**build_params(self, "unlink")):
         try:
@@ -82,7 +92,6 @@ if version_older_then("12.0"):
 else:
     create = api.model_create_multi(create)
 
-
 if version_older_then("10.0"):
     _search = api.cr_uid_context(_search)
 else:
@@ -91,4 +100,5 @@ else:
 BaseModel.create = create
 BaseModel.write = write
 BaseModel._search = _search
+BaseModel.browse = browse
 BaseModel.unlink = unlink

@@ -1,0 +1,2 @@
+setuptools==65.2.0
+elastic-apm==6.11.0

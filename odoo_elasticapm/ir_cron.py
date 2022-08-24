@@ -44,9 +44,9 @@ if version_older_then("10.0"):
 else:
 
     @classmethod
-    def _process_job(cls, job_cr, job, cron_cr):
+    def _process_job(cls, db, cron_cr, job):
         before_cron(job)
-        ori_process_job(job_cr, job, cron_cr)
+        ori_process_job(db, cron_cr, job)
         after_cron(job)
 
 

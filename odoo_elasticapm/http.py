@@ -3,7 +3,7 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from .base import elastic_apm_client, elasticapm, capture_exception
+from .base import capture_exception
 
 try:
     from odoo.http import WebRequest, request
@@ -17,7 +17,7 @@ ori_handle_exception = WebRequest._handle_exception
 
 
 def _handle_exception(self, exception):
-    capture_exception(exception)
+    capture_exception(exception, is_http_request=True)
     return ori_handle_exception(self, exception)
 
 

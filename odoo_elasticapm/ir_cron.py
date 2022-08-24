@@ -6,6 +6,7 @@
 from .base import elastic_apm_client, elasticapm, version_older_then
 
 try:
+    import odoo
     from odoo.addons.base.models.ir_cron import ir_cron as IrCron
     from odoo import api
 except ImportError:
@@ -30,12 +31,10 @@ def after_cron(job):
     elastic_apm_client.end_transaction(name)
 
 
-ori_process_job = IrCron._process_job
-
-
 if version_older_then("10.0"):
 
     def _process_job(self, job_cr, job, cron_cr):
+        ori_process_job = IrCron._process_job
         before_cron(job)
         ori_process_job(self, job_cr, job, cron_cr)
         after_cron(job)
@@ -45,8 +44,10 @@ else:
 
     @classmethod
     def _process_job(cls, db, cron_cr, job):
+        db_name = db.dbname
+        registry = odoo.registry(db_name)
         before_cron(job)
-        ori_process_job(db, cron_cr, job)
+        registry[cls._name]._process_job(db, cron_cr, job)
         after_cron(job)
 
 

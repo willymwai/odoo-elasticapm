@@ -54,6 +54,7 @@ EXCEPTIONS = [
     MissingError,
     ValidationError,
     except_orm,
+    ValueError,
 ]
 
 

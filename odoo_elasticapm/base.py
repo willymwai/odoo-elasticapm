@@ -2,8 +2,8 @@
 
 
 import os
-
-from elasticapm.traces import execution_context
+import sys
+import traceback
 
 try:
     from odoo.tools.config import config
@@ -75,14 +75,10 @@ def get_data_from_request():
     return data
 
 
-def capture_exception(
-    exception, is_http_request=False, apm_transaction=None, apm_span=None
-):
-    if apm_transaction:
-        execution_context.set_transaction(apm_transaction)
-    if apm_span:
-        execution_context.set_span(apm_span)
+def capture_exception(exception, is_http_request=False):
     handled = False
+    exc_info = sys.exc_info()
+    message = ''.join(traceback.format_tb(exception.__traceback__))
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):
             handled = True
@@ -93,10 +89,15 @@ def capture_exception(
     )
     if is_http_request:
         elastic_apm_client.capture_exception(
-            context={"request": get_data_from_request()}, handled=handled
+            context={"request": get_data_from_request()},
+            handled=handled,
+            exc_info=exc_info,
+            message=message,
         )
     else:
-        elastic_apm_client.capture_exception(handled=handled)
+        elastic_apm_client.capture_exception(
+            handled=handled, exc_info=exc_info, message=message
+        )
 
 
 def build_params(self, method):
@@ -119,12 +120,12 @@ def build_params(self, method):
 
 
 def base_write_create(self, vals, ori_method, method_name):
-    with elasticapm.capture_span(**build_params(self, method_name)):
-        try:
+    try:
+        with elasticapm.capture_span(**build_params(self, method_name)):
             return ori_method(self, vals)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    except Exception as e:
+        capture_exception(e)
+        raise
 
 
 if os.environ.get("ELASTIC_APM_ENVIRONMENT"):
@@ -132,11 +133,13 @@ if os.environ.get("ELASTIC_APM_ENVIRONMENT"):
 else:
     environment = config.get("running_env")
 
-elasticapm.instrument()
-
 elastic_apm_client = elasticapm.Client(
     framework_name="Odoo",
     framework_version=odoo_version,
     service_name=os.environ.get("ELASTIC_APM_SERVICE_NAME", "Odoo"),
     environment=environment,
 )
+
+elasticapm.instrument()
+
+elastic_apm_client.begin_transaction("Odoo")

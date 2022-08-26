@@ -78,6 +78,8 @@ def get_data_from_request():
 def capture_exception(exception, is_http_request=False):
     handled = False
     exc_info = sys.exc_info()
+    exc_type, exc_value, exc_traceback = exc_info
+    print("exc_traceback", exc_traceback)
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):
             handled = True

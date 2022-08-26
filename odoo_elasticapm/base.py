@@ -124,11 +124,13 @@ if os.environ.get("ELASTIC_APM_ENVIRONMENT"):
 else:
     environment = config.get("running_env")
 
-elasticapm.instrument()
-
 elastic_apm_client = elasticapm.Client(
     framework_name="Odoo",
     framework_version=odoo_version,
     service_name=os.environ.get("ELASTIC_APM_SERVICE_NAME", "Odoo"),
     environment=environment,
 )
+
+elasticapm.instrument()
+
+elastic_apm_client.begin_transaction("Odoo")

@@ -1,5 +1,4 @@
 from odoo_elasticapm.base import build_params, capture_exception, elasticapm
-from elasticapm.traces import execution_context
 
 try:
     from odoo.fields import Field, Id, One2many
@@ -21,13 +20,11 @@ def field_get(self, obj, owner):
 
 
 def id_get(self, obj, owner):
-    apm_transaction = execution_context.get_transaction()
-    apm_span = execution_context.get_span()
     with elasticapm.capture_span(**build_params(self, "__get__")):
         try:
             return ori_id_get(self, obj, owner)
         except Exception as e:
-            capture_exception(e, apm_transaction=apm_transaction, apm_span=apm_span)
+            capture_exception(e)
             raise
 
 

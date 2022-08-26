@@ -78,6 +78,7 @@ def get_data_from_request():
 def capture_exception(exception, is_http_request=False):
     handled = False
     exc_info = sys.exc_info()
+    _, _, message = exc_info
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):
             handled = True
@@ -91,9 +92,12 @@ def capture_exception(exception, is_http_request=False):
             context={"request": get_data_from_request()},
             handled=handled,
             exc_info=exc_info,
+            message=message,
         )
     else:
-        elastic_apm_client.capture_exception(handled=handled, exc_info=exc_info)
+        elastic_apm_client.capture_exception(
+            handled=handled, exc_info=exc_info, message=message
+        )
 
 
 def build_params(self, method):

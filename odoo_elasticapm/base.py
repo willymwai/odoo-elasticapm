@@ -2,6 +2,7 @@
 
 
 import os
+import traceback
 
 try:
     from odoo.tools.config import config
@@ -42,7 +43,7 @@ odoo_version = odoo.release.version
 
 def version_older_then(version):
     return (
-            odoo.tools.parse_version(odoo_version)[0] < odoo.tools.parse_version(version)[0]
+        odoo.tools.parse_version(odoo_version)[0] < odoo.tools.parse_version(version)[0]
     )
 
 
@@ -75,6 +76,7 @@ def get_data_from_request():
 
 def capture_exception(exception, is_http_request=False):
     handled = False
+    message = traceback.format_exc()
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):
             handled = True
@@ -85,10 +87,12 @@ def capture_exception(exception, is_http_request=False):
     )
     if is_http_request:
         elastic_apm_client.capture_exception(
-            context={"request": get_data_from_request()}, handled=handled
+            context={"request": get_data_from_request()},
+            handled=handled,
+            exc_info=message,
         )
     else:
-        elastic_apm_client.capture_exception(handled=handled)
+        elastic_apm_client.capture_exception(handled=handled, exc_info=message)
 
 
 def build_params(self, method):

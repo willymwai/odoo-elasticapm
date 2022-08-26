@@ -3,6 +3,8 @@
 
 import os
 
+from elasticapm.traces import execution_context
+
 try:
     from odoo.tools.config import config
     from odoo.http import request
@@ -42,7 +44,7 @@ odoo_version = odoo.release.version
 
 def version_older_then(version):
     return (
-            odoo.tools.parse_version(odoo_version)[0] < odoo.tools.parse_version(version)[0]
+        odoo.tools.parse_version(odoo_version)[0] < odoo.tools.parse_version(version)[0]
     )
 
 
@@ -73,7 +75,13 @@ def get_data_from_request():
     return data
 
 
-def capture_exception(exception, is_http_request=False):
+def capture_exception(
+    exception, is_http_request=False, apm_transaction=None, apm_span=None
+):
+    if apm_transaction:
+        execution_context.set_transaction(apm_transaction)
+    if apm_span:
+        execution_context.set_span(apm_span)
     handled = False
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):

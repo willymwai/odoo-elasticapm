@@ -3,6 +3,8 @@
 
 import os
 
+from elasticapm.traces import execution_context
+
 try:
     from odoo.tools.config import config
     from odoo.http import request
@@ -74,6 +76,10 @@ def get_data_from_request():
 
 
 def capture_exception(exception, is_http_request=False):
+    apm_transaction = execution_context.get_transaction()
+    apm_span = execution_context.get_span()
+    print("apm_transaction", apm_transaction)
+    print("apm_span", apm_span)
     handled = False
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):

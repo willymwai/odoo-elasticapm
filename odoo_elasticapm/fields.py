@@ -21,10 +21,10 @@ def field_get(self, obj, owner):
 
 def id_get(self, obj, owner):
     with elasticapm.capture_span(**build_params(self, "__get__")) as span:
+        print("span", span)
         try:
             return ori_id_get(self, obj, owner)
         except Exception as e:
-            print("span", span)
             # capture_exception(e)
             raise
 

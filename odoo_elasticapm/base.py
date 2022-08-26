@@ -111,9 +111,9 @@ def build_params(self, method):
 
 
 def base_write_create(self, vals, ori_method, method_name):
-    elasticapm.capture_span(**build_params(self, method_name))
     try:
-        return ori_method(self, vals)
+        with elasticapm.capture_span(**build_params(self, method_name)):
+            return ori_method(self, vals)
     except Exception as e:
         capture_exception(e)
         raise

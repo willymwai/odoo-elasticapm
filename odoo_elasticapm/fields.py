@@ -11,27 +11,27 @@ ori_one2many_get = One2many.__get__
 
 
 def field_get(self, obj, owner):
-    elasticapm.capture_span(**build_params(self, "__get__"))
     try:
-        return ori_field_get(self, obj, owner)
+        with elasticapm.capture_span(**build_params(self, "__get__")):
+            return ori_field_get(self, obj, owner)
     except Exception as e:
         capture_exception(e)
         raise
 
 
 def id_get(self, obj, owner):
-    elasticapm.capture_span(**build_params(self, "__get__"))
     try:
-        return ori_id_get(self, obj, owner)
+        with elasticapm.capture_span(**build_params(self, "__get__")):
+            return ori_id_get(self, obj, owner)
     except Exception as e:
         capture_exception(e)
         raise
 
 
 def one2many_get(self, obj, owner):
-    elasticapm.capture_span(**build_params(self, "__get__"))
     try:
-        return ori_one2many_get(self, obj, owner)
+        with elasticapm.capture_span(**build_params(self, "__get__")):
+            return ori_one2many_get(self, obj, owner)
     except Exception as e:
         capture_exception(e)
         raise

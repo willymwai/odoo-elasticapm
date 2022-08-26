@@ -111,12 +111,12 @@ def build_params(self, method):
 
 
 def base_write_create(self, vals, ori_method, method_name):
-    with elasticapm.capture_span(**build_params(self, method_name)):
-        try:
-            return ori_method(self, vals)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    elasticapm.capture_span(**build_params(self, method_name))
+    try:
+        return ori_method(self, vals)
+    except Exception as e:
+        capture_exception(e)
+        raise
 
 
 if os.environ.get("ELASTIC_APM_ENVIRONMENT"):

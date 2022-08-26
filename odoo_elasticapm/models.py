@@ -37,30 +37,30 @@ def create(self, vals):
 
 
 def _search(self, *args, **kwargs):
-    with elasticapm.capture_span(**build_params(self, "search")):
-        try:
-            return ori_search(self, *args, **kwargs)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    elasticapm.capture_span(**build_params(self, "search"))
+    try:
+        return ori_search(self, *args, **kwargs)
+    except Exception as e:
+        capture_exception(e)
+        raise
 
 
 def browse(self, *args, **kwargs):
-    with elasticapm.capture_span(**build_params(self, "browse")):
-        try:
-            return ori_browse(self, *args, **kwargs)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    elasticapm.capture_span(**build_params(self, "browse"))
+    try:
+        return ori_browse(self, *args, **kwargs)
+    except Exception as e:
+        capture_exception(e)
+        raise
 
 
 def unlink(self):
-    with elasticapm.capture_span(**build_params(self, "unlink")):
-        try:
-            return ori_unlink(self)
-        except Exception as e:
-            capture_exception(e)
-            raise
+    elasticapm.capture_span(**build_params(self, "unlink"))
+    try:
+        return ori_unlink(self)
+    except Exception as e:
+        capture_exception(e)
+        raise
 
 
 if version_older_then("13.0"):

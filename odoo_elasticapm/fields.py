@@ -38,5 +38,5 @@ def one2many_get(self, obj, owner):
 
 
 Field.__get__ = field_get
-# Id.__get__ = id_get
-# One2many.__get__ = one2many_get
+Id.__get__ = id_get
+One2many.__get__ = one2many_get

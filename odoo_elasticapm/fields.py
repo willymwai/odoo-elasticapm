@@ -24,7 +24,7 @@ def id_get(self, obj, owner):
         try:
             return ori_id_get(self, obj, owner)
         except Exception as e:
-            # capture_exception(e)
+            capture_exception(e)
             raise
 
 

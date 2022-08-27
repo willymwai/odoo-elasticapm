@@ -78,7 +78,7 @@ def get_data_from_request():
 def capture_exception(exception, is_http_request=False):
     handled = False
     exc_info = sys.exc_info()
-    message = traceback.format_exc()
+    message = ''.join(traceback.format_tb(exception.__traceback__))
     for exception_class in EXCEPTIONS:
         if isinstance(exception, exception_class):
             handled = True

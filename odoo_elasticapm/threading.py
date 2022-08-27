@@ -4,16 +4,16 @@ import elasticapm
 
 from odoo_elasticapm.base import build_params, capture_exception
 
-ori_bootstrap_inner = threading.Thread._bootstrap_inner
+ori_start = threading.Thread.start
 
 
-def _bootstrap_inner(self):
+def start(self):
     try:
-        with elasticapm.capture_span(**build_params(self, "_bootstrap_inner")):
-            return ori_bootstrap_inner(self)
+        with elasticapm.capture_span(**build_params(self, "start")):
+            return ori_start(self)
     except Exception as e:
         capture_exception(e)
         raise
 
 
-threading.Thread._bootstrap_inner = _bootstrap_inner
+threading.Thread.start = start

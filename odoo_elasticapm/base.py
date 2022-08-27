@@ -100,13 +100,13 @@ def capture_exception(exception, is_http_request=False):
         )
 
 
-def build_params(self, method):
+def build_params(self, method, span_type="ORM"):
     try:
         class_name = self._name
     except AttributeError:
         class_name = self.__class__.__name__
     return {
-        "name": "ORM {} {}".format(class_name, method),
+        "name": "{} {} {}".format(span_type, class_name, method),
         "span_type": "odoo",
         "span_subtype": "orm",
         "extra": {

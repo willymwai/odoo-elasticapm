@@ -19,7 +19,7 @@ setup(
     version="0.0.1",
     description="Elastic APM integration for Odoo",
     long_description="\n".join(long_description),
-    use_scm_version=True,
+    use_scm_version={"fallback_version": "0.0.1"},
     packages=["odoo_elasticapm"],
     include_package_data=True,
     setup_requires=["setuptools_scm==7.0.5"],

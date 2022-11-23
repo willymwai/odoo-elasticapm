@@ -22,7 +22,7 @@ setup(
     use_scm_version=True,
     packages=["odoo_elasticapm"],
     include_package_data=True,
-    setup_requires=["setuptools_scm==0.0.1"],
+    setup_requires=["setuptools_scm==7.0.5"],
     install_requires=["elastic-apm>=5.4"],
     license="AGPLv3+",
     author="Akretion",
